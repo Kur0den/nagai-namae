@@ -1,4 +1,4 @@
-use rand::{ Rng, prelude::IndexedRandom };
+use rand::{RngExt, prelude::IndexedRandom};
 use std::io::{self, Write};
 use std::thread;
 use std::time::Duration;
@@ -12,6 +12,7 @@ fn main() {
         println!("  {}: {}", i + 1, c);
     }
 
+    let continue_prob = select_probability();
     let first = select_choice(&choices, "始まりの単語を選んでね", "first");
     let last = select_choice(&choices, "終わりの単語を選んでね", "last");
 
@@ -21,7 +22,7 @@ fn main() {
     let mut current_strings = first;
     let mut count = 1;
     loop {
-        let (new_strings, result) = maybe_append(&choices, current_strings);
+        let (new_strings, result) = maybe_append(&choices, current_strings, continue_prob);
         println!("{}回目の抽選: {}", count, result);
         current_strings = new_strings;
         if !result {
@@ -104,9 +105,30 @@ fn load_choices() -> Vec<String> {
         .collect()
 }
 
-fn maybe_append(choices: &Vec<String>, mut current_strings: String) -> (String, bool) {
+fn select_probability() -> f64 {
+    loop {
+        print!("継続確率を入力してね (0〜100、Enterで50%): ");
+        io::stdout().flush().unwrap();
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        let trimmed = input.trim();
+
+        if trimmed.is_empty() {
+            return 0.5;
+        }
+        if let Ok(n) = trimmed.parse::<u32>() {
+            if n <= 100 {
+                return n as f64 / 100.0;
+            }
+        }
+        println!("0〜100の数字を入力してね");
+    }
+}
+
+fn maybe_append(choices: &Vec<String>, mut current_strings: String, continue_prob: f64) -> (String, bool) {
     let mut rng = rand::rng();
-    let result = rng.next_u32() % 2 == 0;
+    let result = rng.random_bool(continue_prob);
     if result {
         // 50%でなんかふえる
         current_strings.push_str(choices.choose(&mut rng).unwrap());
