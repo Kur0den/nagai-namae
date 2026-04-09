@@ -4,7 +4,7 @@
 1. data.txtをプロジェクトのルートに用意して選択肢を改行区切りで入力
 2. cargo run
 
-https://social.vivaldi.net/@DozingCat/116369895548782646 の投稿などを見かけてインスピレーションが湧きました
+https://social.vivaldi.net/@DozingCat/116369895548782646 の投稿などを見かけてインスピレーションが湧きました 
 とうこうしてくれてありがとうございます
 
 ### data.txtの例
